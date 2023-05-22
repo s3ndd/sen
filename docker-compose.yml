@@ -10,6 +10,7 @@ networks:
 
 volumes:
   sen-mysql-data:
+  sen-pg-data:
 
 
 services:
@@ -35,6 +36,23 @@ services:
       - '--character-set-server=utf8mb4'
       - '--local-infile=1'
       - '--default-authentication-plugin=mysql_native_password'
+  
+  sen-postgres:
+    image: postgres:15-alpine
+    container_name: sen-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=sen
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=cart_service,payment_service
+    volumes:
+      - ./docker/sen-postgres/init:/docker-entrypoint-initdb.d
+      - sen-pg-data:/var/lib/postgresql/data
+    networks:
+      sen-local:
+        ipv4_address: 192.168.16.101
 
   # api-gateway:
   #   image: api-gateway
